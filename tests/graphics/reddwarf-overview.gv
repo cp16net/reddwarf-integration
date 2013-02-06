@@ -1,0 +1,46 @@
+digraph G {
+  compound = True;
+  size="10,15"; 
+  ratio=fill; 
+
+  subgraph cluster2 {
+    "nova-db";
+    "reddwarf-db";
+    "cinder-db";
+    label = "Mysql Database";
+  }
+
+  "reddwarf-api" -> "reddwarf-db";
+  "reddwarf-api" -> "reddwarf-taskmanager" -> "reddwarf-db";
+  "reddwarf-taskmanager" -> "nova-api";
+  "nova-compute" [style=filled, color=white]
+  "nova-compute"-> "guest" [lhead=cluster0];
+  "guest" [style=filled, color=white, shape=ellipse];
+  "reddwarf-api" -> "guest";
+  "mysql" [shape=box, style=solid, color=black];
+  "guest" -> "mysql";
+
+  subgraph cluster0 {
+    node [style=filled,color=white];
+    style=filled;
+    color=lightgrey;
+    "mysql";
+    "guest";
+    label = "Instance";
+  }
+
+  "guest" -> "reddwarf-db" ;
+
+  subgraph cluster1 {
+    label="Nova Black Box";
+    fontcolor=white
+    style=filled;
+    color=gray40;
+    "nova-api" [style=filled, color=white]
+    node [style=filled, color=white]
+    "nova-api" -> "nova-db";
+    "nova-api" -> "nova-scheduler" -> "nova-db";
+    "nova-scheduler" -> "nova-compute" -> "nova-db";
+    "nova-scheduler" -> "cinder" -> "cinder-db";
+  }
+}
